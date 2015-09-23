@@ -1,0 +1,97 @@
+---
+layout: post
+title: "gradle 配置参数"
+date: "2015-09-23 13:31"
+---
+
+### `manifestPlaceholders` 的使用
+***
+
+build.gradle
+{% highlight js %}
+android {
+    defaultConfig {
+        ...
+        manifestPlaceholders += [foo: "abc"]
+        manifestPlaceholders += [foo2: "def"]
+    }
+
+    buildTypes {
+        release {
+            manifestPlaceholders += [foo2: "def123566"]
+        }
+    }
+}
+{% endhighlight %}
+
+AndroidManifest.xml
+{% highlight xml %}
+<meta-data
+    android:name="blog"
+    android:value="${foo}" />
+<meta-data
+    android:name="linguofeng.com"
+    android:value="${foo2}" />
+{% endhighlight %}
+
+### `buildConfigField` 的使用
+***
+
+build.gradle
+{% highlight js %}
+android {
+    defaultConfig {
+        ...
+        buildConfigField "boolean", "LOG_DEBUG", "true"
+        buildConfigField "String", "LOG_NAME", "\"linguofeng.com\""
+    }
+
+    buildTypes {
+        release {
+            buildConfigField "String", "LOG_NAME", "\"blog.linguofeng.com\""
+        }
+    }
+}
+{% endhighlight %}
+
+BuildConfig.java 该文件会自动生成
+{% highlight java %}
+public final class BuildConfig {
+    // ...
+    // Fields from default config.
+    public static final boolean LOG_DEBUG = true;
+    public static final String LOG_NAME = "linguofeng.com";
+}
+{% endhighlight %}
+
+MyClass.java
+{% highlight java %}
+if (BuildConfig.LOG_DEBUG) {
+    // print log
+}
+{% endhighlight %}
+
+### `resValue` 的使用
+***
+
+build.gradle
+{% highlight js %}
+android {
+    defaultConfig {
+        resValue "string", "name", "linguofeng"
+    }
+
+    buildTypes {
+        release {
+            resValue "string", "name", "linguofeng.com"
+        }
+    }
+}
+{% endhighlight %}
+
+AndroidManifest.xml
+{% highlight xml %}
+<application android:label="@string/name" />
+{% endhighlight %}
+
+[http://tools.android.com/tech-docs/new-build-system](http://tools.android.com/tech-docs/new-build-system)
